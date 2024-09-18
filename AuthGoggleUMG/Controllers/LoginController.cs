@@ -12,6 +12,10 @@ namespace AuthGoggleUMG.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Autenticación con OAUTH 2.0 De GOOGLE.
+        /// </summary>
+        /// <returns></returns>
         public async Task Login()
         {
             await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, 
@@ -21,6 +25,11 @@ namespace AuthGoggleUMG.Controllers
                 });
         }
 
+        /// <summary>
+        /// Verificación de respuesta de autenticación si esta de acuerdo en permitir el acceso.
+        /// Confirmación.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> GoogleResponse ()
         {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -33,7 +42,20 @@ namespace AuthGoggleUMG.Controllers
                 claim.Value
             });
 
-            return Json(claims);
+            //return Json(claims);
+
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
+
+        /// <summary>
+        /// Limpia la sessión y envia a la vista inicializador de login.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return View("Index");
+        }
+
     }
 }
