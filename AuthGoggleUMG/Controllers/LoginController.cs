@@ -18,11 +18,16 @@ namespace AuthGoggleUMG.Controllers
         /// <returns></returns>
         public async Task Login()
         {
-            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, 
-                new AuthenticationProperties
-                {
-                    RedirectUri= Url.Action("GoogleResponse")
-                });
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleResponse"),
+                Items =
+        {
+            { "prompt", "select_account" } // Fuerza la pantalla de selección de cuenta
+        }
+            };
+
+            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, properties);
         }
 
         /// <summary>
@@ -48,13 +53,16 @@ namespace AuthGoggleUMG.Controllers
         }
 
         /// <summary>
-        /// Limpia la sessión y envia a la vista inicializador de login.
+        /// Limpia la sesión y envía a la vista inicial de login.
         /// </summary>
         /// <returns></returns>
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
-            return View("Index");
+            // Cierra la sesión de cookies (autenticación local)
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirige al usuario a la vista de login después de cerrar sesión
+            return RedirectToAction("Index");
         }
 
     }
